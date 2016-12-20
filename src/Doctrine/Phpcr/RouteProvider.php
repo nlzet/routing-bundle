@@ -85,7 +85,7 @@ class RouteProvider extends DoctrineProvider implements RouteProviderInterface
 
         $collection = new RouteCollection();
 
-        if (empty($candidates)) {
+        if (0 === count($candidates)) {
             return $collection;
         }
 

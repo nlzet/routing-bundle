@@ -125,6 +125,8 @@ class Route extends SymfonyRoute implements RouteObjectInterface
      *
      * @param mixed $object A content object that can be persisted by the
      *                      storage layer
+     *
+     * @return self
      */
     public function setContent($object)
     {
@@ -184,9 +186,9 @@ class Route extends SymfonyRoute implements RouteObjectInterface
         if (!array_key_exists('compiler_class', $options)) {
             $options['compiler_class'] = 'Symfony\\Component\\Routing\\RouteCompiler';
         }
-        foreach ($options as $key => $value) {
+        foreach ($options as $key => &$value) {
             if ($this->isBooleanOption($key)) {
-                $options[$key] = (bool) $value;
+                $value = (bool) $value;
             }
         }
 
@@ -197,6 +199,8 @@ class Route extends SymfonyRoute implements RouteObjectInterface
      * Helper method to check if an option is a boolean option to allow better forms.
      *
      * @param string $name
+     *
+     * @return bool whether $name is a boolean option
      */
     protected function isBooleanOption($name)
     {
@@ -233,13 +237,11 @@ class Route extends SymfonyRoute implements RouteObjectInterface
      */
     public function setPath($pattern)
     {
-        $len = strlen($this->getStaticPrefix());
-
-        if (strncmp($this->getStaticPrefix(), $pattern, $len)) {
+        if (0 !== strpos($pattern, $this->getStaticPrefix())) {
             throw new \InvalidArgumentException('You can not set a pattern for the route that does not start with its current static prefix. First update the static prefix or directly use setVariablePattern.');
         }
 
-        return $this->setVariablePattern(substr($pattern, $len));
+        return $this->setVariablePattern(substr($pattern, strlen($this->getStaticPrefix())));
     }
 
     /**

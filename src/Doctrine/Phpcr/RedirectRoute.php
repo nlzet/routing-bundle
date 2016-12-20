@@ -60,6 +60,8 @@ class RedirectRoute extends RedirectRouteModel implements PrefixInterface, Hiera
      * Additional options:
      *
      * * add_trailing_slash: When set, a trailing slash is appended to the route
+     *
+     * @param array $options
      */
     public function __construct(array $options = array())
     {
@@ -98,6 +100,8 @@ class RedirectRoute extends RedirectRouteModel implements PrefixInterface, Hiera
      * Note that this will change the URL this route matches.
      *
      * @param string $name the new name
+     *
+     * @return self
      */
     public function setName($name)
     {
@@ -115,6 +119,11 @@ class RedirectRoute extends RedirectRouteModel implements PrefixInterface, Hiera
      * Convenience method to set parent and name at the same time.
      *
      * The url will be the url of the parent plus the supplied name.
+     *
+     * @param object $parent The parent document
+     * @param string $name   The local name of this route
+     *
+     * @return self
      */
     public function setPosition($parent, $name)
     {
@@ -183,16 +192,16 @@ class RedirectRoute extends RedirectRouteModel implements PrefixInterface, Hiera
      */
     public function generateStaticPrefix($id, $idPrefix)
     {
-        if (0 == strlen($idPrefix)) {
+        if ('' === $idPrefix) {
             throw new \LogicException('Can not determine the prefix. Either this is a new, unpersisted document or the listener that calls setPrefix is not set up correctly.');
         }
 
-        if (strncmp($id, $idPrefix, strlen($idPrefix))) {
+        if (0 !== strpos($id, $idPrefix)) {
             throw new \LogicException("The id prefix '$idPrefix' does not match the route document path '$id'");
         }
 
         $url = substr($id, strlen($idPrefix));
-        if (empty($url)) {
+        if ('' === $url) {
             $url = '/';
         }
 
@@ -217,13 +226,11 @@ class RedirectRoute extends RedirectRouteModel implements PrefixInterface, Hiera
      */
     public function setPath($pattern)
     {
-        $len = strlen($this->getStaticPrefix());
-
-        if (strncmp($this->getStaticPrefix(), $pattern, $len)) {
+        if (0 !== strpos($pattern, $this->getStaticPrefix())) {
             throw new \InvalidArgumentException('You can not set a pattern for the route document that does not match its repository path. First move it to the correct path.');
         }
 
-        return $this->setVariablePattern(substr($pattern, $len));
+        return $this->setVariablePattern(substr($pattern, strlen($this->getStaticPrefix())));
     }
 
     /**

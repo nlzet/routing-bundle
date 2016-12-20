@@ -118,24 +118,8 @@ class Configuration implements ConfigurationInterface
                                             ->defaultValue(array('/cms/routes'))
                                         ->end() // route_basepaths
                                         ->scalarNode('content_basepath')->defaultValue('/cms/content')->end()
-                                        ->enumNode('enable_initializer')
-                                            ->beforeNormalization()
-                                                ->ifString()
-                                                ->then(function ($v) {
-                                                    switch ($v) {
-                                                        case 'true':
-                                                            return true;
-
-                                                        case 'false':
-                                                            return false;
-
-                                                        default:
-                                                            return $v;
-                                                    }
-                                                })
-                                            ->end()
-                                            ->values(array(true, false, 'auto'))
-                                            ->defaultValue('auto')
+                                        ->booleanNode('enable_initializer')
+                                            ->defaultValue(true)
                                         ->end()
                                     ->end()
                                 ->end() // phpcr

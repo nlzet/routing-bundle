@@ -62,7 +62,7 @@ class CmfRoutingExtension extends Extension
     {
         $loader->load('form-type.xml');
 
-        if (isset($config['dynamic'])) {
+        if (array_key_exists('dynamic', $config)) {
             $routeTypeTypeDefinition = $container->getDefinition('cmf_routing.route_type_form_type');
 
             foreach (array_keys($config['dynamic']['controllers_by_type']) as $routeType) {
@@ -118,7 +118,7 @@ class CmfRoutingExtension extends Extension
         }
 
         if ($config['persistence']['orm']['enabled']) {
-            $this->loadOrmProvider($config['persistence']['orm'], $loader, $container, $locales, $config['match_implicit_locale']);
+            $this->loadOrmProvider($config['persistence']['orm'], $loader, $container, $config['match_implicit_locale']);
             $hasProvider = $hasContentRepository = true;
         }
 
@@ -207,7 +207,7 @@ class CmfRoutingExtension extends Extension
         $dynamic->replaceArgument(2, new Reference($config['url_generator']));
     }
 
-    private function loadPhpcrProvider($config, XmlFileLoader $loader, ContainerBuilder $container, array $locales, $matchImplicitLocale)
+    private function loadPhpcrProvider(array $config, LoaderInterface $loader, ContainerBuilder $container, array $locales, $matchImplicitLocale)
     {
         $loader->load('provider-phpcr.xml');
 
@@ -225,26 +225,14 @@ class CmfRoutingExtension extends Extension
             $definition->setArguments(array($definition->getArgument(0)));
         }
 
-        if ($config['enable_initializer']) {
-            $this->loadInitializer($config, $loader, $container);
+        if (true === $config['enable_initializer']) {
+            $this->loadInitializer($loader, $container);
         }
     }
 
-    /**
-     * @param array            $config
-     * @param XmlFileLoader    $loader
-     * @param ContainerBuilder $container
-     */
-    private function loadInitializer($config, XmlFileLoader $loader, ContainerBuilder $container)
+    private function loadInitializer(LoaderInterface $loader, ContainerBuilder $container)
     {
-        $initializedBasepaths = array();
-        if ('auto' === $config['enable_initializer'] && empty($initializedBasepaths)) {
-            return;
-        }
-
-        if (true === $config['enable_initializer'] && empty($initializedBasepaths)) {
-            $initializedBasepaths = $container->getParameter($this->getAlias().'.dynamic.persistence.phpcr.route_basepaths');
-        }
+        $initializedBasepaths = $container->getParameter($this->getAlias().'.dynamic.persistence.phpcr.route_basepaths');
 
         $container->setParameter(
             $this->getAlias().'.dynamic.persistence.phpcr.initialized_basepaths',
@@ -254,7 +242,7 @@ class CmfRoutingExtension extends Extension
         $loader->load('initializer-phpcr.xml');
     }
 
-    private function loadOrmProvider($config, XmlFileLoader $loader, ContainerBuilder $container, $matchImplicitLocale)
+    private function loadOrmProvider(array $config, LoaderInterface $loader, ContainerBuilder $container, $matchImplicitLocale)
     {
         $loader->load('provider-orm.xml');
 

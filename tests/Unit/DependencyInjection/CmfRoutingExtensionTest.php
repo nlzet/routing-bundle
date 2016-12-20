@@ -325,23 +325,6 @@ class CmfRoutingExtensionTest extends AbstractExtensionTestCase
         $this->assertFalse($this->container->has('cmf_routing.initializer'));
     }
 
-    public function testInitializerEnabledEvenWithoutSonata()
-    {
-        $this->load(array(
-                'dynamic' => array(
-                    'enabled' => true,
-                    'persistence' => array(
-                        'phpcr' => array(
-                            'enabled' => true,
-                            'enable_initializer' => true,
-                        ),
-                    ),
-                ),
-            ));
-
-        $this->assertTrue($this->container->has('cmf_routing.initializer'));
-    }
-
     public function testSettingCustomRouteClassForOrm()
     {
         $this->load(array(
@@ -370,22 +353,5 @@ class CmfRoutingExtensionTest extends AbstractExtensionTestCase
         ));
 
         $this->assertContainerBuilderHasParameter('cmf_routing.backend_type_orm_custom', true);
-    }
-
-    public function testInitializerDisabledAutomaticallyIfSonataIsDisabled()
-    {
-        $this->load(array(
-            'dynamic' => array(
-                'enabled' => true,
-                'persistence' => array(
-                    'phpcr' => array(
-                        'enabled' => true,
-                        'enable_initializer' => 'auto',
-                    ),
-                ),
-            ),
-        ));
-
-        $this->assertFalse($this->container->has('cmf_routing.initializer'));
     }
 }
